@@ -5,8 +5,7 @@ function minutosParaHora(minutos) {
 }
 
 function calcularHorasExtras(minutosTrabalhados, cargaHorariaMinutos) {
-    let minutosExtras = minutosTrabalhados - cargaHorariaMinutos;
-    return minutosExtras > 0 ? minutosExtras : 0;
+    return minutosTrabalhados > cargaHorariaMinutos ? minutosTrabalhados - cargaHorariaMinutos : 0;
 }
 
 function processFile() {
@@ -15,13 +14,18 @@ function processFile() {
     const fileInput = document.getElementById('fileInput');
     const cpfFilter = document.getElementById('cpfFilter');
     const horasTrabalhoInput = document.getElementById('horasTrabalho');
+    const salarioInput = document.getElementById('salario');
 
-    if (!fileInput.files.length || !cpfFilter.value || !horasTrabalhoInput.value) {
+    if (!fileInput.files.length || !cpfFilter.value || !horasTrabalhoInput.value || !salarioInput.value) {
         console.log("Todos os campos devem ser preenchidos!");
         return;
     }
 
     const file = fileInput.files[0];
+    const salarioMensal = parseFloat(salarioInput.value) || 0;
+    const cargaHorariaMensal = 220; // Padrão para 44h semanais
+    const valorHora = salarioMensal / cargaHorariaMensal;
+    const valorHoraExtra = valorHora * 1.5;
 
     const reader = new FileReader();
     reader.onload = function(event) {
@@ -104,9 +108,17 @@ function processFile() {
             });
         });
 
+        // Cálculo do pagamento total e das horas extras
+        const totalSalarioBase = (totalMinutosTrabalhados / 60) * valorHora;
+        const totalSalarioExtras = (totalMinutosExtras / 60) * valorHoraExtra;
+        const salarioTotal = totalSalarioBase + totalSalarioExtras;
+
         // Atualizar os totais na interface
         document.getElementById('totalHorasTrabalhadas').textContent = minutosParaHora(totalMinutosTrabalhados);
         document.getElementById('totalHorasExtras').textContent = minutosParaHora(totalMinutosExtras);
+        document.getElementById('totalSalarioBase').textContent = `R$ ${totalSalarioBase.toFixed(2)}`;
+        document.getElementById('totalSalarioExtras').textContent = `R$ ${totalSalarioExtras.toFixed(2)}`;
+        document.getElementById('salarioTotal').textContent = `R$ ${salarioTotal.toFixed(2)}`;
 
         console.log("Registros finais:", registros);
     };
@@ -119,8 +131,9 @@ function verificarCampos() {
     const fileInput = document.getElementById('fileInput').files.length > 0;
     const cpf = document.getElementById('cpfFilter').value.trim() !== "";
     const horas = document.getElementById('horasTrabalho').value.trim() !== "";
+    const salario = document.getElementById('salario').value.trim() !== "";
 
-    document.getElementById('process').disabled = !(fileInput && cpf && horas);
+    document.getElementById('process').disabled = !(fileInput && cpf && horas && salario);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -128,5 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
     
     document.getElementById("cpfFilter").addEventListener("input", verificarCampos);
     document.getElementById("horasTrabalho").addEventListener("input", verificarCampos);
+    document.getElementById("salario").addEventListener("input", verificarCampos);
     document.getElementById("fileInput").addEventListener("change", verificarCampos);
 });
