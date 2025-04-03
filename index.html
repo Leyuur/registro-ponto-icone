@@ -19,6 +19,11 @@
         </div>
 
         <div class="input-group">
+            <label for="salario">Salário Mensal (R$):</label>
+            <input type="number" id="salario" min="0" placeholder="Ex: 2500">
+        </div>
+
+        <div class="input-group">
             <label for="cpfFilter">CPF:</label>
             <input type="text" id="cpfFilter" placeholder="Digite o CPF">
         </div>
@@ -48,6 +53,9 @@
         <div class="totals">
             <p><strong>Total de horas trabalhadas:</strong> <span id="totalHorasTrabalhadas">00:00</span></p>
             <p><strong>Total de horas extras:</strong> <span id="totalHorasExtras">00:00</span></p>
+            <p><strong>Salário base:</strong> <span id="totalSalarioBase">R$ 0,00</span></p>
+            <p><strong>Salário por horas extras:</strong> <span id="totalSalarioExtras">R$ 0,00</span></p>
+            <p><strong>Salário total bruto:</strong> <span id="salarioTotal">R$ 0,00</span></p>
         </div>
     </div>
 
