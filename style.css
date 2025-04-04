@@ -43,8 +43,8 @@ h1 {
     margin-bottom: 5px;
 }
 
-/* Inputs */
-input, button {
+/* Inputs e Select */
+input, select, button {
     width: 100%;
     padding: 10px;
     border-radius: 5px;
@@ -52,13 +52,13 @@ input, button {
     font-size: 16px;
 }
 
-input {
+input, select {
     background: #fff;
     border: 2px solid #ddd;
     transition: 0.3s;
 }
 
-input:focus {
+input:focus, select:focus {
     border-color: #ed5d3d;
     outline: none;
 }
