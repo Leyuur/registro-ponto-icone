@@ -15,6 +15,7 @@ function processFile() {
     const cpfFilter = document.getElementById('cpfFilter');
     const horasTrabalhoInput = document.getElementById('horasTrabalho');
     const salarioInput = document.getElementById('salario');
+    const formato = document.getElementById('formato');
 
     if (!fileInput.files.length || !cpfFilter.value || !horasTrabalhoInput.value || !salarioInput.value) {
         console.log("Todos os campos devem ser preenchidos!");
@@ -42,29 +43,67 @@ function processFile() {
         const registros = {};
         let totalMinutosTrabalhados = 0;
         let totalMinutosExtras = 0;
+        // let unidade;
 
-        let lineCount = 1;
-        lines.forEach(line => {
+        // if(formato.value == "Unidade 2") {
+        //     unidade = 2;
+        // } else if(formato.value == "Unidade 2") {
+        //     unidade = 5;
+        // }
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
             let lineTrimed = line.replace(/\s+/g, "");
-            if (!lineTrimed) return;
-
-            if (lineCount === 1 || lineCount === lines.length - 1) {
-                lineCount++;
-                return;
+            if (!lineTrimed) continue;
+        
+            if (i === 0 || i === lines.length - 1) {
+                console.log(lineTrimed) 
+                continue;
             }
+                console.log(lineTrimed.length)
 
-            lineCount++;
-
-            const rawData = lineTrimed.substring(12, 20);
-            const [yy, mm, dd] = rawData.split('-');
-            const data = `${dd}/${mm}/20${yy}`;
-
-            const hora = lineTrimed.substring(21, 29);
+            if (i === 2) {
+                if (lineTrimed.length > 38 && formato.value == "Unidade 2") {
+                    alert("Tipo de arquivo inválido para " + formato.value);
+                    break;
+                }
+    
+                if (lineTrimed.length < 44 && formato.value == "Unidade 5") {
+                    alert("Tipo de arquivo inválido para " + formato.value);
+                    break;
+                }
+            }
+            
+        
+            let rawData;
+            let yy, mm, dd;
+            let data;
+            let hora;
+        
+            switch(formato.value) {
+                case 'Unidade 5':   
+                    rawData = lineTrimed.substring(12, 20);
+                    [yy, mm, dd] = rawData.split('-');
+                    data = `${dd}/${mm}/20${yy}`;
+                    hora = lineTrimed.substring(21, 29);
+                    break;
+                case 'Unidade 2': 
+                    rawData = lineTrimed.substring(11, 18);  // Posição correta da data
+                    dd = rawData.substring(0, 2);  
+                    mm = rawData.substring(2, 4);  
+                    yyyy = rawData.substring(4, 8);  
+                
+                    data = `${dd}/${mm}/${yyyy}`;
+                    console.log("Data extraída:", data);
+                
+                    hora = lineTrimed.substring(18, 20) + ":" + lineTrimed.substring(20, 22);   
+                    break;
+            }
 
             const cpfMatch = lineTrimed.match(/(\d{11})$/);
             let cpf = cpfMatch ? cpfMatch[1] : "CPF inválido";
 
-            if (cpf !== cpfFilter.value) return; // Filtrar apenas o CPF digitado
+            if (cpf !== cpfFilter.value) continue;
 
             if (!registros[cpf]) {
                 registros[cpf] = {};
@@ -73,11 +112,14 @@ function processFile() {
                 registros[cpf][data] = [];
             }
             registros[cpf][data].push(hora);
-        });
+
+            console.log(registros)
+        }
 
         function horaParaMinutos(hora) {
             const [h, m] = hora.split(':').map(Number);
             return h * 60 + m;
+            
         }
 
         Object.entries(registros).forEach(([cpf, datas]) => {
