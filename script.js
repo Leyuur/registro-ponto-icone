@@ -8,9 +8,18 @@ function calcularHorasExtras(minutosTrabalhados, cargaHorariaMinutos) {
     return minutosTrabalhados > cargaHorariaMinutos ? minutosTrabalhados - cargaHorariaMinutos : 0;
 }
 
-function processFile() {
-    console.log("Função processFile chamada");
+function showToast(message, isError = false) {
+    Toastify({
+        text: message,
+        duration: 4000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: isError ? "#d32f2f" : "#4CAF50",
+        stopOnFocus: true,
+    }).showToast();
+}
 
+function processFile() {
     const fileInput = document.getElementById('fileInput');
     const cpfFilter = document.getElementById('cpfFilter');
     const horasTrabalhoInput = document.getElementById('horasTrabalho');
@@ -18,7 +27,7 @@ function processFile() {
     const formato = document.getElementById('formato');
 
     if (!fileInput.files.length || !cpfFilter.value || !horasTrabalhoInput.value) {
-        console.log("Todos os campos devem ser preenchidos!");
+        showToast("Todos os campos devem ser preenchidos!", true);
         return;
     }
 
@@ -30,17 +39,16 @@ function processFile() {
 
     const reader = new FileReader();
     reader.onload = function(event) {
-        console.log("Arquivo carregado");
         const lines = event.target.result.split('\n');
-
         const tableBody = document.querySelector('#dataTable tbody');
         if (!tableBody) {
-            console.log("Elemento #dataTable tbody não encontrado");
+            showToast("Elemento da tabela não encontrado!", true);
             return;
         }
 
         tableBody.innerHTML = '';
         const registros = {};
+        const mesesEncontrados = new Set();
         let totalMinutosTrabalhados = 0;
         let totalMinutosExtras = 0;
 
@@ -48,32 +56,23 @@ function processFile() {
             let line = lines[i];
             let lineTrimed = line.replace(/\s+/g, "");
             if (!lineTrimed) continue;
-        
-            if (i === 0 || i === lines.length - 1) {
-                console.log(lineTrimed) 
-                continue;
-            }
-                console.log(lineTrimed.length)
+
+            if (i === 0 || i === lines.length - 1) continue;
 
             if (i === 2) {
                 if (lineTrimed.length > 38 && formato.value == "Outra") {
-                    alert("Tipo de arquivo inválido para " + formato.value);
+                    showToast("Tipo de arquivo inválido para 'Outra'", true);
                     break;
                 }
-    
+
                 if (lineTrimed.length < 44 && formato.value == "Unidade 5") {
-                    alert("Tipo de arquivo inválido para " + formato.value);
+                    showToast("Tipo de arquivo inválido para 'Unidade 5'", true);
                     break;
                 }
             }
-            
-        
-            let rawData;
-            let yy, mm, dd;
-            let data;
-            let hora;
-            let unidade;
-        
+
+            let rawData, yy, mm, dd, data, hora, unidade;
+
             switch(formato.value) {
                 case 'Unidade 5':   
                     unidade = 5;
@@ -88,96 +87,43 @@ function processFile() {
                     dd = rawData.substring(0, 2);  
                     mm = rawData.substring(2, 4);  
                     yyyy = rawData.substring(4, 8);  
-                
                     data = `${dd}/${mm}/${yyyy}`;
-                    console.log("Data extraída:", data);
-                
                     hora = lineTrimed.substring(18, 20) + ":" + lineTrimed.substring(20, 22);   
                     break;
             }
 
-            let cpfMatch;
-            if(unidade === 5) cpfMatch = lineTrimed.substring(0, 45).match(/(\d{11})$/);
-            else cpfMatch = lineTrimed.substring(0, 35).match(/(\d{11})$/);
+            let cpfMatch = (unidade === 5)
+                ? lineTrimed.substring(0, 45).match(/(\d{11})$/)
+                : lineTrimed.substring(0, 35).match(/(\d{11})$/);
 
-            
             let cpf = cpfMatch ? cpfMatch[1] : "CPF inválido";
-
-            console.log("CPF extraído:", cpf, "| CPF filtro:", cpfFilter.value);
-
-
             const cpfFiltro = cpfFilter.value.replace(/\D/g, '');
-
-
             if (cpf !== cpfFiltro) continue;
 
-            if (!registros[cpf]) {
-                registros[cpf] = {};
-            }
-            if (!registros[cpf][data]) {
-                registros[cpf][data] = [];
-            }
+            if (!registros[cpf]) registros[cpf] = {};
+            if (!registros[cpf][data]) registros[cpf][data] = [];
             registros[cpf][data].push(hora);
 
-            console.log(registros)
-
-            let tituloMes = document.getElementById("h2-mes")
-
-            switch (mm) {
-                case "01":
-                    tituloMes.innerHTML = "Janeiro";
-                    break;
-                case "02":
-                    tituloMes.innerHTML = "Fevereiro";
-                    break;
-                case "03":
-                    tituloMes.innerHTML = "Março";
-                    break;
-                case "04":
-                    tituloMes.innerHTML = "Abril";
-                    break;
-                case "05":
-                    tituloMes.innerHTML = "Maio";
-                    break;
-                case "06":
-                    tituloMes.innerHTML = "Junho";
-                    break;
-                case "07":
-                    tituloMes.innerHTML = "Julho";
-                    break;
-                case "08":
-                    tituloMes.innerHTML = "Agosto";
-                    break;
-                case "09":
-                    tituloMes.innerHTML = "Setembro";
-                    break;
-                case "10":
-                    tituloMes.innerHTML = "Outubro";
-                    break;
-                case "11":
-                    tituloMes.innerHTML = "Novembro";
-                    break;
-                case "12":
-                    tituloMes.innerHTML = "Dezembro";
-                    break;
-                default:
-                    tituloMes.innerHTML = "";
-            }
-            
+            const nomesMeses = {
+                "01": "Janeiro", "02": "Fevereiro", "03": "Março", "04": "Abril",
+                "05": "Maio", "06": "Junho", "07": "Julho", "08": "Agosto",
+                "09": "Setembro", "10": "Outubro", "11": "Novembro", "12": "Dezembro"
+            };
+            if (nomesMeses[mm]) mesesEncontrados.add(nomesMeses[mm]);
         }
+
+        document.getElementById("h2-mes").innerHTML = Array.from(mesesEncontrados).join('/');
 
         function horaParaMinutos(hora) {
             const [h, m] = hora.split(':').map(Number);
             return h * 60 + m;
-            
         }
 
         Object.entries(registros).forEach(([cpf, datas]) => {
             Object.entries(datas).forEach(([data, horarios]) => {
-                horarios.sort(); // Garantir que os horários estejam em ordem crescente
-
-                const minutosInicio = horaParaMinutos(horarios[0]); // Primeiro horário (entrada)
-                const minutosFim = horaParaMinutos(horarios[horarios.length - 1]); // Último horário (saída)
+                horarios.sort();
+                const minutosInicio = horaParaMinutos(horarios[0]);
+                const minutosFim = horaParaMinutos(horarios[horarios.length - 1]);
                 const minutosTrabalhados = minutosFim - minutosInicio;
                 const horasTrabalhadas = minutosParaHora(minutosTrabalhados);
 
@@ -200,31 +146,31 @@ function processFile() {
             });
         });
 
-        
-
-        // Cálculo do pagamento total e das horas extras
         const totalSalarioBase = (totalMinutosTrabalhados / 60) * valorHora;
         const totalSalarioExtras = (totalMinutosExtras / 60) * valorHoraExtra;
         const salarioTotal = totalSalarioBase + totalSalarioExtras;
 
-        // Atualizar os totais na interface
         document.getElementById('totalHorasTrabalhadas').textContent = minutosParaHora(totalMinutosTrabalhados);
         document.getElementById('totalHorasExtras').textContent = minutosParaHora(totalMinutosExtras);
-        if(document.getElementById('totalSalarioBase'))document.getElementById('totalSalarioBase').textContent = `R$ ${totalSalarioBase.toFixed(2)}`;
-        if(document.getElementById('totalSalarioExtras'))document.getElementById('totalSalarioExtras').textContent = `R$ ${totalSalarioExtras.toFixed(2)}`;
-        if(document.getElementById('salarioTotal'))document.getElementById('salarioTotal').textContent = `R$ ${salarioTotal.toFixed(2)}`;
-
-        console.log("Registros finais:", registros);
+        if(document.getElementById('totalSalarioBase')) document.getElementById('totalSalarioBase').textContent = `R$ ${totalSalarioBase.toFixed(2)}`;
+        if(document.getElementById('totalSalarioExtras')) document.getElementById('totalSalarioExtras').textContent = `R$ ${totalSalarioExtras.toFixed(2)}`;
+        if(document.getElementById('salarioTotal')) document.getElementById('salarioTotal').textContent = `R$ ${salarioTotal.toFixed(2)}`;
 
         if (Object.keys(registros).length === 0) {
-            alert("Você não tem registros nesta unidade neste mês.");
-        }        
+            showToast("Você não tem registros nesta unidade neste mês.", true);
+        } else {
+            showToast("Arquivo processado com sucesso!");
+
+            const resultado = document.getElementById("h2-mes");
+            if (resultado) {
+                resultado.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
     };
 
     reader.readAsText(file);
 }
 
-// Ativar o botão somente quando os campos estiverem preenchidos
 function verificarCampos() {
     const fileInput = document.getElementById('fileInput').files.length > 0;
     const cpf = document.getElementById('cpfFilter').value.trim() !== "";
@@ -235,7 +181,6 @@ function verificarCampos() {
 
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("process").addEventListener("click", processFile);
-    
     document.getElementById("cpfFilter").addEventListener("input", verificarCampos);
     document.getElementById("horasTrabalho").addEventListener("input", verificarCampos);
     document.getElementById("fileInput").addEventListener("change", verificarCampos);
