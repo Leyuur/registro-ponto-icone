@@ -72,16 +72,19 @@ function processFile() {
             let yy, mm, dd;
             let data;
             let hora;
+            let unidade;
         
             switch(formato.value) {
                 case 'Unidade 5':   
+                    unidade = 5;
                     rawData = lineTrimed.substring(12, 20);
                     [yy, mm, dd] = rawData.split('-');
                     data = `${dd}/${mm}/20${yy}`;
                     hora = lineTrimed.substring(21, 29);
                     break;
                 case 'Outra': 
-                    rawData = lineTrimed.substring(11, 18);  // Posição correta da data
+                    unidade = 0;
+                    rawData = lineTrimed.substring(10, 18);
                     dd = rawData.substring(0, 2);  
                     mm = rawData.substring(2, 4);  
                     yyyy = rawData.substring(4, 8);  
@@ -93,10 +96,20 @@ function processFile() {
                     break;
             }
 
-            const cpfMatch = lineTrimed.substring(0, 45).match(/(\d{11})$/);
-            let cpf = cpfMatch ? cpfMatch[1] : "CPF inválido";
+            let cpfMatch;
+            if(unidade === 5) cpfMatch = lineTrimed.substring(0, 45).match(/(\d{11})$/);
+            else cpfMatch = lineTrimed.substring(0, 35).match(/(\d{11})$/);
+
             
-            if (cpf !== cpfFilter.value) continue;
+            let cpf = cpfMatch ? cpfMatch[1] : "CPF inválido";
+
+            console.log("CPF extraído:", cpf, "| CPF filtro:", cpfFilter.value);
+
+
+            const cpfFiltro = cpfFilter.value.replace(/\D/g, '');
+
+
+            if (cpf !== cpfFiltro) continue;
 
             if (!registros[cpf]) {
                 registros[cpf] = {};
@@ -107,6 +120,50 @@ function processFile() {
             registros[cpf][data].push(hora);
 
             console.log(registros)
+
+            let tituloMes = document.getElementById("h2-mes")
+
+            switch (mm) {
+                case "01":
+                    tituloMes.innerHTML = "Janeiro";
+                    break;
+                case "02":
+                    tituloMes.innerHTML = "Fevereiro";
+                    break;
+                case "03":
+                    tituloMes.innerHTML = "Março";
+                    break;
+                case "04":
+                    tituloMes.innerHTML = "Abril";
+                    break;
+                case "05":
+                    tituloMes.innerHTML = "Maio";
+                    break;
+                case "06":
+                    tituloMes.innerHTML = "Junho";
+                    break;
+                case "07":
+                    tituloMes.innerHTML = "Julho";
+                    break;
+                case "08":
+                    tituloMes.innerHTML = "Agosto";
+                    break;
+                case "09":
+                    tituloMes.innerHTML = "Setembro";
+                    break;
+                case "10":
+                    tituloMes.innerHTML = "Outubro";
+                    break;
+                case "11":
+                    tituloMes.innerHTML = "Novembro";
+                    break;
+                case "12":
+                    tituloMes.innerHTML = "Dezembro";
+                    break;
+                default:
+                    tituloMes.innerHTML = "";
+            }
+            
         }
 
         function horaParaMinutos(hora) {
@@ -142,6 +199,8 @@ function processFile() {
                 tableBody.appendChild(row);
             });
         });
+
+        
 
         // Cálculo do pagamento total e das horas extras
         const totalSalarioBase = (totalMinutosTrabalhados / 60) * valorHora;
