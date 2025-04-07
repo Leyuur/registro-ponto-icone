@@ -17,14 +17,14 @@ function processFile() {
     const salarioInput = document.getElementById('salario');
     const formato = document.getElementById('formato');
 
-    if (!fileInput.files.length || !cpfFilter.value || !horasTrabalhoInput.value || !salarioInput.value) {
+    if (!fileInput.files.length || !cpfFilter.value || !horasTrabalhoInput.value) {
         console.log("Todos os campos devem ser preenchidos!");
         return;
     }
 
     const file = fileInput.files[0];
     const salarioMensal = parseFloat(salarioInput.value) || 0;
-    const cargaHorariaMensal = 220; // Padrão para 44h semanais
+    const cargaHorariaMensal = 220;
     const valorHora = salarioMensal / cargaHorariaMensal;
     const valorHoraExtra = valorHora * 1.5;
 
@@ -43,13 +43,6 @@ function processFile() {
         const registros = {};
         let totalMinutosTrabalhados = 0;
         let totalMinutosExtras = 0;
-        // let unidade;
-
-        // if(formato.value == "Unidade 2") {
-        //     unidade = 2;
-        // } else if(formato.value == "Unidade 2") {
-        //     unidade = 5;
-        // }
 
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
