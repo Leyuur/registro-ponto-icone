@@ -87,7 +87,7 @@ function processFile() {
                     data = `${dd}/${mm}/20${yy}`;
                     hora = lineTrimed.substring(21, 29);
                     break;
-                case 'Unidade 2': 
+                case 'Outra': 
                     rawData = lineTrimed.substring(11, 18);  // Posição correta da data
                     dd = rawData.substring(0, 2);  
                     mm = rawData.substring(2, 4);  
