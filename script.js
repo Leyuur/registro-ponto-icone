@@ -215,6 +215,10 @@ function processFile() {
         if(document.getElementById('salarioTotal'))document.getElementById('salarioTotal').textContent = `R$ ${salarioTotal.toFixed(2)}`;
 
         console.log("Registros finais:", registros);
+
+        if (Object.keys(registros).length === 0) {
+            alert("Você não tem registros nesta unidade neste mês.");
+        }        
     };
 
     reader.readAsText(file);
