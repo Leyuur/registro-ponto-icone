@@ -56,7 +56,7 @@ function processFile() {
                 console.log(lineTrimed.length)
 
             if (i === 2) {
-                if (lineTrimed.length > 38 && formato.value == "Unidade 2") {
+                if (lineTrimed.length > 38 && formato.value == "Outra") {
                     alert("Tipo de arquivo inválido para " + formato.value);
                     break;
                 }
@@ -166,9 +166,8 @@ function verificarCampos() {
     const fileInput = document.getElementById('fileInput').files.length > 0;
     const cpf = document.getElementById('cpfFilter').value.trim() !== "";
     const horas = document.getElementById('horasTrabalho').value.trim() !== "";
-    const salario = document.getElementById('salario').value.trim() !== "";
 
-    document.getElementById('process').disabled = !(fileInput && cpf && horas && salario);
+    document.getElementById('process').disabled = !(fileInput && cpf && horas);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -176,6 +175,5 @@ document.addEventListener("DOMContentLoaded", () => {
     
     document.getElementById("cpfFilter").addEventListener("input", verificarCampos);
     document.getElementById("horasTrabalho").addEventListener("input", verificarCampos);
-    document.getElementById("salario").addEventListener("input", verificarCampos);
     document.getElementById("fileInput").addEventListener("change", verificarCampos);
 });
