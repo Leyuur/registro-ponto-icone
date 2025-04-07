@@ -93,9 +93,9 @@ function processFile() {
                     break;
             }
 
-            const cpfMatch = lineTrimed.match(/(\d{11})$/);
+            const cpfMatch = lineTrimed.substring(0, 45).match(/(\d{11})$/);
             let cpf = cpfMatch ? cpfMatch[1] : "CPF inválido";
-
+            
             if (cpf !== cpfFilter.value) continue;
 
             if (!registros[cpf]) {
@@ -151,9 +151,9 @@ function processFile() {
         // Atualizar os totais na interface
         document.getElementById('totalHorasTrabalhadas').textContent = minutosParaHora(totalMinutosTrabalhados);
         document.getElementById('totalHorasExtras').textContent = minutosParaHora(totalMinutosExtras);
-        document.getElementById('totalSalarioBase').textContent = `R$ ${totalSalarioBase.toFixed(2)}`;
-        document.getElementById('totalSalarioExtras').textContent = `R$ ${totalSalarioExtras.toFixed(2)}`;
-        document.getElementById('salarioTotal').textContent = `R$ ${salarioTotal.toFixed(2)}`;
+        if(document.getElementById('totalSalarioBase'))document.getElementById('totalSalarioBase').textContent = `R$ ${totalSalarioBase.toFixed(2)}`;
+        if(document.getElementById('totalSalarioExtras'))document.getElementById('totalSalarioExtras').textContent = `R$ ${totalSalarioExtras.toFixed(2)}`;
+        if(document.getElementById('salarioTotal'))document.getElementById('salarioTotal').textContent = `R$ ${salarioTotal.toFixed(2)}`;
 
         console.log("Registros finais:", registros);
     };
