@@ -1,9 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 /* Reset básico */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: "Poppins", sans-serif;
 }
 
 /* Corpo da página */
@@ -124,19 +126,53 @@ tr:nth-child(even) {
 
 /* Estilização da área de totais */
 .totals {
-    margin-top: 20px;
-    padding: 15px;
-    background: #f8f8f8;
-    border-radius: 8px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    padding: 25px 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     text-align: center;
     font-size: 18px;
+    color: #444;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: 0.3s ease-in-out;
 }
 
 .totals p {
-    margin: 5px 0;
-    font-weight: bold;
+    margin: 0;
+    font-weight: 600;
+    font-size: 17px;
+    color: #333;
 }
+
+.totals span {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ed5d3d;
+    background-color: #fff4f0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    transition: background-color 0.3s;
+}
+
+
+#h2-mes {
+    margin-top: 30px;
+    padding: 10px 15px;
+    background-color: #fff0ec;
+    border: 2px solid #ed5d3d;
+    color: #ed5d3d;
+    font-size: 22px;
+    font-weight: bold;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+}
+
 
 /* Responsividade */
 @media (max-width: 600px) {
