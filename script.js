@@ -13,6 +13,22 @@ function calcularHorasExtras(minutosTrabalhados, cargaHorariaMinutos) {
     return minutosTrabalhados > cargaHorariaMinutos ? minutosTrabalhados - cargaHorariaMinutos : 0;
 }
 
+function mostrarToast(mensagem, tipo = "erro") {
+    const cores = {
+        erro: "#ff4d4d",
+        sucesso: "#4BB543",
+        info: "#3b82f6",
+        alerta: "#facc15",
+    };
+    Toastify({
+        text: mensagem,
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: cores[tipo] || "#333",
+    }).showToast();
+}
+
 function processFile() {
     const fileInput = document.getElementById('fileInput');
     const cpfFilter = document.getElementById('cpfFilter');
@@ -20,7 +36,7 @@ function processFile() {
     const formato = document.getElementById('formato');
 
     if (!fileInput.files.length || !cpfFilter.value) {
-        alert("Preencha todos os campos obrigatórios.");
+        mostrarToast("Preencha todos os campos obrigatórios.");
         return;
     }
 
@@ -52,11 +68,11 @@ function processFile() {
 
                 if (i === 2) {
                     if (line.length > 34 && formato.value === "2") {
-                        alert("Tipo de arquivo inválido para este formato.");
+                        mostrarToast("Tipo de arquivo inválido para este formato.");
                         break;
                     }
                     if (line.length < 44 && formato.value === "1") {
-                        alert("Tipo de arquivo inválido para este formato.");
+                        mostrarToast("Tipo de arquivo inválido para este formato.");
                         break;
                     }
                 }
@@ -77,14 +93,13 @@ function processFile() {
                         data = `${dd2}/${mm2}/${yyyy2}`;
                         hora = line.substring(18, 20) + ":" + line.substring(20, 22);
                         break;
-
                 }
 
                 const cpfMatch = line.substring(0, 45).match(/(\d{11})$/);
                 const cpf = cpfMatch ? cpfMatch[1] : false;
 
                 if (!cpf) {
-                    alert("Nenhum registro encontrado neste CPF")
+                    mostrarToast("Nenhum registro encontrado neste CPF.");
                     return;
                 }
 
@@ -96,14 +111,12 @@ function processFile() {
 
             arquivosProcessados++;
             if (arquivosProcessados === files.length) {
-                // Organizar por data
                 const datasOrdenadas = Object.keys(registros).sort((a, b) => {
                     const [da, ma, aa] = a.split('/').map(Number);
                     const [db, mb, ab] = b.split('/').map(Number);
                     return new Date(aa, ma - 1, da) - new Date(ab, mb - 1, db);
                 });
 
-                // Calcular carga horária média (mediana)
                 datasOrdenadas.forEach(data => {
                     const horarios = registros[data].sort();
                     const entrada = horaParaMinutos(horarios[0]);
@@ -121,7 +134,6 @@ function processFile() {
                     cargaHorariaMinutos = minutosPorDia[mid];
                 }
 
-                // Montar tabela
                 datasOrdenadas.forEach(data => {
                     const horarios = registros[data].sort();
                     const entrada = horaParaMinutos(horarios[0]);
@@ -144,7 +156,6 @@ function processFile() {
                     tableBody.appendChild(row);
                 });
 
-                // Totais
                 const totalSalarioBase = (totalMinutosTrabalhados / 60) * valorHora;
                 const totalSalarioExtras = (totalMinutosExtras / 60) * valorHoraExtra;
                 const salarioTotal = totalSalarioBase + totalSalarioExtras;
@@ -157,7 +168,6 @@ function processFile() {
 
                 document.getElementById("downloadExcel").disabled = false;
 
-                // Exibir mês no título
                 if (datasOrdenadas.length > 0) {
                     const [dia, mes, ano] = datasOrdenadas[0].split("/");
                     const nomesMeses = {
@@ -172,7 +182,7 @@ function processFile() {
                 }
             }
         };
-        reader.readAsText(file); // ✅ Correto: fora do onload
+        reader.readAsText(file);
     });
 }
 
