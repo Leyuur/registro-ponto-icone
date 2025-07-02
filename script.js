@@ -61,8 +61,6 @@ function processFile() {
         reader.onload = function (event) {
             const lines = event.target.result.split('\n');
 
-            console.log(lines)
-
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].replace(/\s+/g, "");
                 if (!line) continue;
@@ -98,15 +96,17 @@ function processFile() {
                 }
 
                 const cpfMatch = line.substring(0, 45).match(/(\d{11})$/);
-                const cpf = cpfMatch ? cpfMatch[1] : false;
+                const cpf = cpfMatch ? cpfMatch[1] : "CPF inválido";
 
-                if (cpf !== cpfFilter.value) {
-                    mostrarToast("Nenhum registro encontrado neste CPF.");
-                    continue;
-                };
+                if (cpf !== cpfFilter.value) continue;
 
                 if (!registros[data]) registros[data] = [];
                 registros[data].push(hora);
+            }
+
+            if (Object.keys(registros).length < 1) {
+                mostrarToast("Nenhum registro encontrado neste CPF.");
+                return
             }
 
             arquivosProcessados++;
