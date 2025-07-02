@@ -51,36 +51,43 @@ function processFile() {
                 if (i === 0 || i === lines.length - 1) continue;
 
                 if (i === 2) {
-                    if (line.length > 38 && formato.value === "Outra") {
-                        alert("Tipo de arquivo inválido para " + formato.value);
+                    if (line.length > 34 && formato.value === "2") {
+                        alert("Tipo de arquivo inválido para este formato.");
                         break;
                     }
-                    if (line.length < 44 && formato.value === "Unidade 5") {
-                        alert("Tipo de arquivo inválido para " + formato.value);
+                    if (line.length < 44 && formato.value === "1") {
+                        alert("Tipo de arquivo inválido para este formato.");
                         break;
                     }
                 }
 
                 let data, hora;
                 switch (formato.value) {
-                    case 'Unidade 5':
+                    case '1':
                         const rawData1 = line.substring(12, 20);
                         const [yy, mm, dd] = rawData1.split('-');
                         data = `${dd}/${mm}/20${yy}`;
                         hora = line.substring(21, 29);
                         break;
-                    case 'Outra':
-                        const rawData2 = line.substring(11, 18);
+                    case '2':
+                        const rawData2 = line.substring(10, 18);
                         const dd2 = rawData2.substring(0, 2);
                         const mm2 = rawData2.substring(2, 4);
                         const yyyy2 = rawData2.substring(4, 8);
                         data = `${dd2}/${mm2}/${yyyy2}`;
                         hora = line.substring(18, 20) + ":" + line.substring(20, 22);
                         break;
+
                 }
 
                 const cpfMatch = line.substring(0, 45).match(/(\d{11})$/);
-                const cpf = cpfMatch ? cpfMatch[1] : "CPF inválido";
+                const cpf = cpfMatch ? cpfMatch[1] : false;
+
+                if (!cpf) {
+                    alert("Nenhum registro encontrado neste CPF")
+                    return;
+                }
+
                 if (cpf !== cpfFilter.value) continue;
 
                 if (!registros[data]) registros[data] = [];
